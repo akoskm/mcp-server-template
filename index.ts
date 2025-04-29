@@ -1,16 +1,24 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import express, { Request, Response } from "express"
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js"
+import { z } from "zod"
 
 // Create server instance
-const server = new Server({
+const server = new McpServer({
     name: "itsuki-mcp-server",
-    version: "1.0.0"
-}, {
+    version: "1.0.0",
     capabilities: {
         tools: {}
     }
 })
+
+// Add the add tool
+server.tool("add",
+    { a: z.number(), b: z.number() },
+    async ({ a, b }) => ({
+        content: [{ type: "text", text: String(a + b) }]
+    })
+)
 
 // to support multiple simultaneous connections we have a lookup object from
 // sessionId to transport
